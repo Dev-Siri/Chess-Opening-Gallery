@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.2.3",
-    "react": "^18",
+    "@react-icons/all-files": "^4.1.0",
+    "chess.js": "^1.0.0-beta.8",
+    "next": "^15.0.0-rc.0",
+    "react": "^19.0.0-rc-935180c7e0-20240524",
     "react-chessboard": "^4.5.0",
-    "react-dom": "^18"
+    "react-dom": "^19.0.0-rc-935180c7e0-20240524",
+    "react-loading-skeleton": "^3.4.0"
   },
   "devDependencies": {
     "typescript": "^5",
