@@ -1,4 +1,5 @@
 import { DEFAULT_POSITION } from "chess.js";
+import Link from "next/link";
 
 import type { ExploredPositions } from "@/types/explored-position";
 
@@ -21,15 +22,25 @@ export default async function Home({ searchParams: { q } }: Props) {
       <p className="mt-4 text-2xl text-center [text-wrap:balance]">
         Search openings, and go move by move to look at the most common outcomes
       </p>
-      <div className="flex items-center justify-center w-full mb-20 mt-6">
+      <div className="flex items-center justify-center w-full mt-6">
         <SearchInput />
+      </div>
+      <div className="flex w-full">
+        <Link
+          href="/from-pgn"
+          className="bg-gray-800 font-semibold p-3 px-6 mt-4 rounded-md hover:opacity-90 duration-200"
+        >
+          Load PGN
+        </Link>
       </div>
       <section className="w-full grid grid-cols-3 py-6 gap-6">
         {(q !== ""
           ? exploredPositions.moves.filter((move) => move.san.includes(q))
           : exploredPositions.moves
         ).map((move) => (
-          <PositionCard currentUrlPathname="/" key={move.san} {...move} />
+          <Link href={`/${move.san}`} key={move.san}>
+            <PositionCard {...move} />
+          </Link>
         ))}
       </section>
     </article>

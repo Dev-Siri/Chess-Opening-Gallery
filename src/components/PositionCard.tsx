@@ -1,14 +1,14 @@
+"use client";
 import { Chess, DEFAULT_POSITION } from "chess.js";
-import Link from "next/link";
 
 import type { Move } from "@/types/explored-position";
 
 import { calculateDraws, calculateWinrateForWhite } from "@/utils/stats";
 
+import { useEffect, useState } from "react";
 import ChessBoard from "./ChessBoard";
 
 interface Props extends Move {
-  currentUrlPathname: string;
   currentFen?: string;
 }
 
@@ -18,21 +18,28 @@ export default function PositionCard({
   black,
   averageRating,
   draws,
-  currentUrlPathname,
   currentFen = DEFAULT_POSITION,
 }: Props) {
+  const [game, setGame] = useState(new Chess());
+
   const winrateForWhite = calculateWinrateForWhite(white, black);
   const winrateForBlack = 100 - winrateForWhite;
   const drawPercentage = calculateDraws(white, black, draws);
-  const game = new Chess(currentFen);
 
-  game.move(san);
+  useEffect(() => {
+    const gameCopy = new Chess(currentFen);
+
+    // inner peace
+    try {
+      gameCopy.move(san);
+    } catch {}
+
+    setGame(gameCopy);
+    return () => setGame(new Chess());
+  }, [game, setGame, currentFen, san]);
 
   return (
-    <Link
-      href={`${currentUrlPathname === "/" ? "" : currentUrlPathname}/${san}`}
-      className="relative border-[#3a3a3a] bg-[#3a3a3a] border-4 rounded-md overflow-hidden hover:scale-105 duration-200 cursor-pointer select-none"
-    >
+    <div className="h-full w-full relative border-[#3a3a3a] bg-[#3a3a3a] border-4 rounded-md overflow-hidden hover:scale-105 duration-200 cursor-pointer select-none">
       <div className="flex justify-between items-center absolute z-10 py-3 w-[90%] bg-[#3a3a3a] bg-opacity-70 ml-[10%]">
         <div>
           <p className="text-xs pl-2">
@@ -44,7 +51,7 @@ export default function PositionCard({
         </div>
         <p className="text-2xl pr-2">{san}</p>
       </div>
-      <div className="flex h-full w-full rounded-sm">
+      <div className="flex h-full w-full rounded-md overflow-hidden">
         <div className="h-full w-[10%]">
           <div
             className="h-full w-full flex pt-2 justify-center bg-slate-800"
@@ -64,9 +71,9 @@ export default function PositionCard({
           </div>
         </div>
         <div className="h-full w-[90%] pointer-events-none">
-          <ChessBoard startingPositionFen={game.fen()} />
+          <ChessBoard fen={game.fen()} presentationOnly />
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

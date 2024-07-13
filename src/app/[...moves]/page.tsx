@@ -1,10 +1,15 @@
-import ChessBoard from "@/components/ChessBoard";
 import { Chess } from "chess.js";
+import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import Skeleton from "react-loading-skeleton";
+
+import ChessBoard from "@/components/ChessBoard";
 import FenCopy from "./fen-copy";
 import MoveInfo from "./move-info";
+import MoveList from "./move-list";
 import NextMoves from "./next-moves";
+
+const SoundEffectPlayer = dynamic(() => import("./sound-effect-player"));
 
 interface Props {
   params: {
@@ -37,27 +42,19 @@ export default async function Move({ params: { moves } }: Props) {
   }
 
   const currentStateFen = game.fen();
-  const movePlayed = moves.at(-1);
+  const movePlayed = moves.at(-1) ?? "";
 
   return (
     <div className="h-full w-full">
+      <SoundEffectPlayer move={movePlayed} moveIndex={moves.length} />
       <section className="flex gap-10">
-        <div className="h-2/5 w-2/5 select-none pointer-events-none">
-          <ChessBoard startingPositionFen={currentStateFen} />
-        </div>
+        <ChessBoard fen={currentStateFen} height={500} width={500} />
         <div className="flex flex-col gap-4 w-1/2">
-          <Suspense
-            fallback={
-              <Skeleton
-                height={350}
-                baseColor="#202020"
-                highlightColor="#444"
-              />
-            }
-          >
-            <MoveInfo fen={currentStateFen} movePlayed={movePlayed ?? ""} />
+          <Suspense fallback={<Skeleton height={350} />}>
+            <MoveInfo fen={currentStateFen} movePlayed={movePlayed} />
           </Suspense>
           <FenCopy fen={currentStateFen} />
+          <MoveList moves={moves} />
         </div>
       </section>
       <h4 className="mt-6 text-4xl font-semibold">Follow-up moves</h4>
@@ -65,12 +62,12 @@ export default async function Move({ params: { moves } }: Props) {
       <Suspense
         fallback={
           <div className="w-full grid grid-cols-3 py-6 gap-6">
-            <Skeleton height={350} baseColor="#202020" highlightColor="#444" />
-            <Skeleton height={350} baseColor="#202020" highlightColor="#444" />
-            <Skeleton height={350} baseColor="#202020" highlightColor="#444" />
-            <Skeleton height={350} baseColor="#202020" highlightColor="#444" />
-            <Skeleton height={350} baseColor="#202020" highlightColor="#444" />
-            <Skeleton height={350} baseColor="#202020" highlightColor="#444" />
+            <Skeleton height={350} />
+            <Skeleton height={350} />
+            <Skeleton height={350} />
+            <Skeleton height={350} />
+            <Skeleton height={350} />
+            <Skeleton height={350} />
           </div>
         }
       >

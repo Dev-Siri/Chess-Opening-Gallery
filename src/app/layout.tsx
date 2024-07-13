@@ -5,6 +5,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 import ThemeContextProvider from "@/context/ThemeContext";
+import { SkeletonTheme } from "react-loading-skeleton";
 import Header from "./header";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,11 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-[#111111] overflow-x-hidden text-white ${inter.className}`}
+        className={`bg-[#111111] overflow-x-hidden text-white subpixel-antialiased ${inter.className}`}
       >
         <ThemeContextProvider>
-          <Header />
-          <main>{children}</main>
+          <SkeletonTheme baseColor="#202020" highlightColor="#444">
+            <Header />
+            <main>{children}</main>
+          </SkeletonTheme>
         </ThemeContextProvider>
       </body>
     </html>

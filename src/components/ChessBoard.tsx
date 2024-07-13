@@ -1,120 +1,73 @@
 "use client";
 import { Chess, DEFAULT_POSITION } from "chess.js";
 import Image from "next/image";
+import { useState } from "react";
 import { Chessboard as ReactChessBoard } from "react-chessboard";
 
 import { useThemeContext } from "@/context/ThemeContext";
 
-interface Props {
-  startingPositionFen?: string;
-}
+import { getPiecesByTheme } from "@/constants/theme";
+import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
+
+type Props = {
+  height?: number;
+  width?: number;
+  presentationOnly?: boolean;
+} & (
+  | {
+      game: Chess;
+    }
+  | {
+      fen?: string;
+    }
+);
 
 export default function ChessBoard({
-  startingPositionFen = DEFAULT_POSITION,
+  height,
+  width,
+  presentationOnly,
+  ...props
 }: Props) {
+  const [orientation, setOrientation] = useState<BoardOrientation>("white");
   const { theme } = useThemeContext();
 
   return (
-    <ReactChessBoard
-      position={new Chess(startingPositionFen).fen()}
-      customPieces={{
-        bB: () => (
+    <div className="flex flex-col gap-2">
+      <div
+        className="select-none rounded-md overflow-hidden"
+        style={{ height, width }}
+      >
+        <ReactChessBoard
+          position={
+            "game" in props ? props.game.fen() : props.fen ?? DEFAULT_POSITION
+          }
+          boardOrientation={orientation}
+          isDraggablePiece={() => false}
+          customPieces={getPiecesByTheme(theme)}
+        />
+      </div>
+      {!presentationOnly && (
+        <button
+          type="button"
+          className="flex items-center justify-center bg-gray-800 w-fit p-2 px-5 gap-1 hover:opacity-90 duration-200 rounded-md"
+          onClick={() =>
+            setOrientation(orientation === "white" ? "black" : "white")
+          }
+          aria-label={`Flip orientation to ${
+            orientation === "white" ? "Black" : "White"
+          }'s perspective`}
+        >
+          <span className="font-semibold">Flip</span>
           <Image
-            src={`/pieces/${theme}/black/bishop.png`}
-            alt="Black Bishop"
-            height={80}
-            width={80}
+            src={`/pieces/${theme}/${orientation}/king.png`}
+            alt={`${orientation.charAt(0).toUpperCase()}${orientation.slice(
+              1
+            )} King`}
+            height={30}
+            width={30}
           />
-        ),
-        bR: () => (
-          <Image
-            src={`/pieces/${theme}/black/rook.png`}
-            alt="Black Rook"
-            height={80}
-            width={80}
-          />
-        ),
-        bN: () => (
-          <Image
-            src={`/pieces/${theme}/black/knight.png`}
-            alt="Black Knight"
-            height={80}
-            width={80}
-          />
-        ),
-        bK: () => (
-          <Image
-            src={`/pieces/${theme}/black/king.png`}
-            alt="Black King"
-            height={80}
-            width={80}
-          />
-        ),
-        bP: () => (
-          <Image
-            src={`/pieces/${theme}/black/pawn.png`}
-            alt="Black Pawn"
-            height={80}
-            width={80}
-          />
-        ),
-        bQ: () => (
-          <Image
-            src={`/pieces/${theme}/black/queen.png`}
-            alt="Black Queen"
-            height={80}
-            width={80}
-          />
-        ),
-        wB: () => (
-          <Image
-            src={`/pieces/${theme}/white/bishop.png`}
-            alt="White Bishop"
-            height={80}
-            width={80}
-          />
-        ),
-        wR: () => (
-          <Image
-            src={`/pieces/${theme}/white/rook.png`}
-            alt="White Rook"
-            height={80}
-            width={80}
-          />
-        ),
-        wN: () => (
-          <Image
-            src={`/pieces/${theme}/white/knight.png`}
-            alt="White Knight"
-            height={80}
-            width={80}
-          />
-        ),
-        wK: () => (
-          <Image
-            src={`/pieces/${theme}/white/king.png`}
-            alt="White King"
-            height={80}
-            width={80}
-          />
-        ),
-        wP: () => (
-          <Image
-            src={`/pieces/${theme}/white/pawn.png`}
-            alt="White Pawn"
-            height={80}
-            width={80}
-          />
-        ),
-        wQ: () => (
-          <Image
-            src={`/pieces/${theme}/white/queen.png`}
-            alt="White Queen"
-            height={80}
-            width={80}
-          />
-        ),
-      }}
-    />
+        </button>
+      )}
+    </div>
   );
 }
